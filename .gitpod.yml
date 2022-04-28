@@ -1,0 +1,35 @@
+image: gitpod/workspace-postgres
+
+tasks:
+  - name: install postgresql
+    init: |
+      docker run --name postgresql-container -p 5432:5432 -e POSTGRES_PASSWORD=somePassword -d postgres
+      docker ps -a
+  - init: |
+      cd hello-primsa
+      npm install
+    command: |
+      export HMR_HOST=`gp url 3000`
+      npm run dev
+    env:
+      DATABASE_URL: postgres://gitpod@localhost/posts
+  - command: |
+      npx prisma studio
+    env:
+      DATABASE_URL: postgres://gitpod@localhost/posts
+
+ports:
+  - port: 3000
+    onOpen: open-browser
+  - port: 5432
+    onOpen: ignore
+  - port: 5555
+    onOpen: open-browser
+
+vscode:
+  extensions:
+    - prisma.prisma
+    - bradlc.vscode-tailwindcss
+    - mikestead.dotenv
+    - dbaeumer.vscode-eslint
+    - esbenp.prettier-vscode

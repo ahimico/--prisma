@@ -3,21 +3,27 @@ image: gitpod/workspace-postgres
 tasks:
   - name: install postgresql
     init: |
-      docker run --name postgresql-container -p 5432:5432 -e POSTGRES_PASSWORD=somePassword -d postgres
+      docker-compose up -d
       docker ps -a
-  - init: |
-      cd hello-primsa
+  - name: install npm
+    init: |
+      cd hello-prisma/
       npm install
     command: |
       export HMR_HOST=`gp url 3000`
       npm run dev
     env:
       DATABASE_URL: postgres://gitpod@localhost/posts
-  - command: |
+  - name: Prisma studio
+    init: |
+      cd hello-prisma/
       npx prisma studio
     env:
       DATABASE_URL: postgres://gitpod@localhost/posts
-
+  - name: Run express server
+    init: |
+      cd hello-prisma/
+      npm run dev
 ports:
   - port: 3000
     onOpen: open-browser
@@ -33,3 +39,4 @@ vscode:
     - mikestead.dotenv
     - dbaeumer.vscode-eslint
     - esbenp.prettier-vscode
+    - ms-vscode.sublime-keybindings
